@@ -1,21 +1,35 @@
 import streamlit as st
 import numpy as np
-import pandas as pd
 from fpdf import FPDF
 
-# Modelos de painéis Absen (Exemplo, pode ser atualizado com mais modelos)
+# Modelos de painéis Absen para locação
 painel_modelos = {
-    "Absen PL2.5": {"pitch": 2.5, "res_x": 192, "res_y": 192, "largura": 480, "altura": 480},
-    "Absen PL3.9": {"pitch": 3.9, "res_x": 128, "res_y": 128, "largura": 500, "altura": 500},
+    "KLCOB V2 Series - 0.78mm": {"pitch": 0.78, "res_x": 768, "res_y": 432, "largura": 600, "altura": 337.5},
+    "KLCOB V2 Series - 0.93mm": {"pitch": 0.93, "res_x": 640, "res_y": 360, "largura": 600, "altura": 337.5},
+    "KLCOB V2 Series - 1.25mm": {"pitch": 1.25, "res_x": 480, "res_y": 270, "largura": 600, "altura": 337.5},
+    "KLCOB V2 Series - 1.56mm": {"pitch": 1.56, "res_x": 384, "res_y": 216, "largura": 600, "altura": 337.5},
+    "CPS Series - 1.8mm": {"pitch": 1.8, "res_x": 178, "res_y": 267, "largura": 320, "altura": 480},
+    "CPS Series - 2.0mm": {"pitch": 2.0, "res_x": 160, "res_y": 240, "largura": 320, "altura": 480},
+    "CPS Series - 2.5mm": {"pitch": 2.5, "res_x": 128, "res_y": 192, "largura": 320, "altura": 480},
+    "NX Series - 1.2mm": {"pitch": 1.2, "res_x": 800, "res_y": 450, "largura": 960, "altura": 540},
+    "NX Series - 1.5mm": {"pitch": 1.5, "res_x": 640, "res_y": 360, "largura": 960, "altura": 540},
+    "NX Series - 1.8mm": {"pitch": 1.8, "res_x": 533, "res_y": 300, "largura": 960, "altura": 540},
+    "NX Series - 2.5mm": {"pitch": 2.5, "res_x": 384, "res_y": 216, "largura": 960, "altura": 540},
+    "NX Series - 3.7mm": {"pitch": 3.7, "res_x": 260, "res_y": 146, "largura": 960, "altura": 540},
 }
 
-# Modelos de processadores Novastar (Exemplo, pode ser atualizado)
+# Modelos de processadores NovaStar
 processadores = {
-    "Novastar MCTRL660": {"max_pixels": 650000, "portas": 4},
-    "Novastar VX6s": {"max_pixels": 1300000, "portas": 6},
+    "Novastar VX1000": {"max_pixels": 6500000, "portas": 10},
+    "Novastar VX600": {"max_pixels": 3900000, "portas": 6},
+    "Novastar VX400": {"max_pixels": 2300000, "portas": 4},
+    "Novastar H2 com H_20xRJ45": {"max_pixels": 13000000, "portas": 20},
+    "Novastar H2 com H_16xRJ45+2xFiber": {"max_pixels": 10400000, "portas": 16},
+    "Novastar H5 com H_20xRJ45": {"max_pixels": 13000000, "portas": 20},
+    "Novastar H5 com H_16xRJ45+2xFiber": {"max_pixels": 10400000, "portas": 16},
 }
 
-# Função para calcular configuração do painel
+# Função para calcular a configuração do painel
 def calcular_painel(modelo_painel, largura_total, altura_total, processador):
     painel = painel_modelos[modelo_painel]
     proc = processadores[processador]
@@ -57,28 +71,9 @@ processador = st.sidebar.selectbox("Escolha o processador:", list(processadores.
 if st.sidebar.button("Calcular"):
     resultados = calcular_painel(modelo_painel, largura_total, altura_total, processador)
     
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.subheader("Resultados")
-        st.write(f"Número de módulos na largura: {resultados['num_modulos_x']:.2f}")
-        st.write(f"Número de módulos na altura: {resultados['num_modulos_y']:.2f}")
-        st.write(f"Total de módulos: {resultados['total_modulos']:.0f}")
-        st.write(f"Resolução total: {resultados['total_pixels_x']} x {resultados['total_pixels_y']}")
-        st.write(f"Número de portas necessárias: {resultados['num_portas']:.0f}")
-    
-    with col2:
-        st.subheader("Geração de PDF")
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_font("Arial", size=12)
-        pdf.cell(200, 10, "Relatório de Configuração do Painel LED", ln=True, align='C')
-        pdf.cell(200, 10, f"Modelo do painel: {modelo_painel}", ln=True)
-        pdf.cell(200, 10, f"Largura total: {largura_total} mm", ln=True)
-        pdf.cell(200, 10, f"Altura total: {altura_total} mm", ln=True)
-        pdf.cell(200, 10, f"Processador: {processador}", ln=True)
-        pdf.cell(200, 10, f"Número de módulos: {resultados['total_modulos']:.0f}", ln=True)
-        pdf.cell(200, 10, f"Resolução total: {resultados['total_pixels_x']} x {resultados['total_pixels_y']}", ln=True)
-        pdf.cell(200, 10, f"Número de portas necessárias: {resultados['num_portas']:.0f}", ln=True)
-        pdf.output("painel_led_config.pdf")
-        st.success("PDF gerado com sucesso!")
+    st.subheader("Resultados")
+    st.write(f"Número de módulos na largura: {resultados['num_modulos_x']:.2f}")
+    st.write(f"Número de módulos na altura: {resultados['num_modulos_y']:.2f}")
+    st.write(f"Total de módulos: {resultados['total_modulos']:.0f}")
+    st.write(f"Resolução total: {resultados['total_pixels_x']} x {resultados['total_pixels_y']}")
+    st.write(f"Número de portas necessárias: {resultados['num_portas']:.0f}")
